@@ -13,13 +13,19 @@
     "windows": [
       {
         "title": "mysql-manager",
-        "width": 800,
-        "height": 600
+        "width": 1200,
+        "height": 800,
+        "label": "main"
       }
     ],
     "security": {
-      "csp": null
-    }
+      "csp": null,
+      "devCsp": null
+    },
+    "withGlobalTauri": true
+  },
+  "plugins": {
+    "sql": {}
   },
   "bundle": {
     "active": true,

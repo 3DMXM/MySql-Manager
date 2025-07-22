@@ -1,0 +1,600 @@
+/* CSS 变量定义 */
+:root {
+  --color-primary: #409eff;
+  --color-success: #67c23a;
+  --color-warning: #e6a23c;
+  --color-danger: #f56c6c;
+  --color-info: #909399;
+  
+  /* 亮色模式颜色 */
+  --bg-color-page: #f0f2f5;
+  --bg-color-base: #ffffff;
+  --bg-color-overlay: #ffffff;
+  --text-color-primary: #303133;
+  --text-color-regular: #606266;
+  --text-color-secondary: #909399;
+  --text-color-placeholder: #a8abb2;
+  --text-color-disabled: #c0c4cc;
+  --border-color: #e4e7ed;
+  --border-color-light: #f0f2f5;
+  --border-color-lighter: #f5f7fa;
+}
+
+html.dark {
+  /* 暗色模式颜色覆盖 */
+  --bg-color-page: #0a0a0a;
+  --bg-color-base: #1a1a1a;
+  --bg-color-overlay: #2a2a2a;
+  --text-color-primary: #e4e7ed;
+  --text-color-regular: #cfcfcf;
+  --text-color-secondary: #909399;
+  --text-color-placeholder: #8d9095;
+  --text-color-disabled: #6c6e72;
+  --border-color: #333;
+  --border-color-light: #404040;
+  --border-color-lighter: #505050;
+}
+
+/* 全局暗色模式样式 */
+
+/* 全局滚动条样�?*/
+html.dark ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: #2a2a2a;
+  border-radius: 3px;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 3px;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* Element Plus 全局暗色模式覆盖 */
+html.dark .el-overlay-dialog {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+html.dark .el-overlay {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+html.dark .el-popper {
+  background-color: #2a2a2a !important;
+  border-color: #404040 !important;
+  color: #e4e7ed !important;
+}
+
+html.dark .el-tooltip__popper {
+  background-color: #2a2a2a !important;
+  border-color: #404040 !important;
+  color: #e4e7ed !important;
+}
+
+html.dark .el-dropdown-menu {
+  background-color: #2a2a2a !important;
+  border-color: #404040 !important;
+}
+
+html.dark .el-dropdown-menu__item {
+  color: #e4e7ed !important;
+}
+
+html.dark .el-dropdown-menu__item:focus, 
+html.dark .el-dropdown-menu__item:hover {
+  background-color: #409eff !important;
+  color: #fff !important;
+}
+
+html.dark .el-select-dropdown {
+  background-color: #2a2a2a !important;
+  border-color: #404040 !important;
+}
+
+html.dark .el-select-dropdown__item {
+  color: #e4e7ed !important;
+}
+
+html.dark .el-select-dropdown__item:hover {
+  background-color: #409eff !important;
+}
+
+html.dark .el-select-dropdown__item.selected {
+  background-color: #409eff !important;
+  color: #fff !important;
+}
+
+html.dark .el-message {
+  background-color: #2a2a2a !important;
+  border-color: #404040 !important;
+  color: #e4e7ed !important;
+}
+
+html.dark .el-message--success {
+  background-color: #67c23a !important;
+  color: #fff !important;
+}
+
+html.dark .el-message--error {
+  background-color: #f56c6c !important;
+  color: #fff !important;
+}
+
+html.dark .el-message--warning {
+  background-color: #e6a23c !important;
+  color: #fff !important;
+}
+
+html.dark .el-message--info {
+  background-color: #909399 !important;
+  color: #fff !important;
+}
+
+html.dark .el-loading-mask {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+html.dark .el-loading-spinner .el-loading-text {
+  color: #e4e7ed !important;
+}
+
+/* CodeMirror 暗色模式样式补充 */
+body.light .cm-editor {
+  background-color: #fff !important;
+}
+
+body.light .cm-editor .cm-content {
+  color: #333 !important;
+}
+
+body.light .cm-editor .cm-focused {
+  outline: 1px solid #409eff !important;
+}
+
+body.light .cm-editor .cm-cursor {
+  border-left-color: #333 !important;
+}
+
+body.light .cm-editor .cm-selectionBackground {
+  background-color: #b3d4fc !important;
+}
+
+/* Element Plus 组件暗色模式增强 */
+
+/* 输入框组�?*/
+html.dark .el-input__wrapper {
+  background-color: #2a2a2a !important;
+  border-color: #404040 !important;
+  box-shadow: 0 0 0 1px #404040 inset !important;
+}
+
+html.dark .el-input__wrapper:hover {
+  border-color: #505050 !important;
+  box-shadow: 0 0 0 1px #505050 inset !important;
+}
+
+html.dark .el-input__wrapper.is-focus {
+  border-color: #409eff !important;
+  box-shadow: 0 0 0 1px #409eff inset !important;
+}
+
+html.dark .el-input__inner {
+  color: #e4e7ed !important;
+  background-color: transparent !important;
+}
+
+html.dark .el-input__inner::placeholder {
+  color: #8d9095 !important;
+}
+
+html.dark .el-input-number {
+  background-color: #2a2a2a !important;
+  border-color: #404040 !important;
+}
+
+html.dark .el-input-number .el-input__wrapper {
+  background-color: #2a2a2a !important;
+}
+
+html.dark .el-input-number__increase,
+html.dark .el-input-number__decrease {
+  background-color: #2a2a2a !important;
+  border-color: #404040 !important;
+  color: #e4e7ed !important;
+}
+
+html.dark .el-input-number__increase:hover,
+html.dark .el-input-number__decrease:hover {
+  background-color: #3a3a3a !important;
+  color: #409eff !important;
+}
+
+/* 按钮组件 */
+html.dark .el-button {
+  background-color: #2a2a2a !important;
+  border-color: #404040 !important;
+  color: #e4e7ed !important;
+}
+
+html.dark .el-button:hover {
+  background-color: #3a3a3a !important;
+  border-color: #505050 !important;
+}
+
+html.dark .el-button:focus {
+  border-color: #409eff !important;
+}
+
+html.dark .el-button--primary {
+  background-color: #409eff !important;
+  border-color: #409eff !important;
+  color: #fff !important;
+}
+
+html.dark .el-button--primary:hover {
+  background-color: #66b1ff !important;
+  border-color: #66b1ff !important;
+}
+
+html.dark .el-button--success {
+  background-color: #67c23a !important;
+  border-color: #67c23a !important;
+}
+
+html.dark .el-button--success:hover {
+  background-color: #85ce61 !important;
+  border-color: #85ce61 !important;
+}
+
+html.dark .el-button--warning {
+  background-color: #e6a23c !important;
+  border-color: #e6a23c !important;
+}
+
+html.dark .el-button--warning:hover {
+  background-color: #ebb563 !important;
+  border-color: #ebb563 !important;
+}
+
+html.dark .el-button--danger {
+  background-color: #f56c6c !important;
+  border-color: #f56c6c !important;
+}
+
+html.dark .el-button--danger:hover {
+  background-color: #f78989 !important;
+  border-color: #f78989 !important;
+}
+
+html.dark .el-button--info {
+  background-color: #909399 !important;
+  border-color: #909399 !important;
+}
+
+html.dark .el-button--info:hover {
+  background-color: #a6a9ad !important;
+  border-color: #a6a9ad !important;
+}
+
+/* 表格组件 */
+html.dark .el-table {
+  background-color: #1a1a1a !important;
+  color: #e4e7ed !important;
+}
+
+html.dark .el-table th.el-table__cell {
+  background-color: #2a2a2a !important;
+  border-bottom: 1px solid #404040 !important;
+  color: #e4e7ed !important;
+}
+
+html.dark .el-table td.el-table__cell {
+  border-bottom: 1px solid #333 !important;
+}
+
+html.dark .el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell {
+  background-color: #1f1f1f !important;
+}
+
+html.dark .el-table__body tr:hover > td.el-table__cell {
+  background-color: #262626 !important;
+}
+
+html.dark .el-table--border .el-table__cell {
+  border-right: 1px solid #333 !important;
+}
+
+html.dark .el-table::before {
+  background-color: #333 !important;
+}
+
+html.dark .el-table__empty-text {
+  color: #909399 !important;
+}
+
+/* 标签页组�?*/
+html.dark .el-tabs {
+  background-color: #1a1a1a !important;
+}
+
+html.dark .el-tabs__header {
+  background-color: #1a1a1a !important;
+  border-bottom: 1px solid #333 !important;
+}
+
+html.dark .el-tabs__nav-wrap::after {
+  background-color: #333 !important;
+}
+
+html.dark .el-tabs__item {
+  color: #909399 !important;
+  border-color: transparent !important;
+}
+
+html.dark .el-tabs__item:hover {
+  color: #409eff !important;
+}
+
+html.dark .el-tabs__item.is-active {
+  color: #409eff !important;
+  border-bottom-color: #409eff !important;
+}
+
+html.dark .el-tabs__nav {
+  background-color: #1a1a1a !important;
+}
+
+html.dark .el-tabs__content {
+  background-color: #1a1a1a !important;
+}
+
+/* 分页组件 */
+html.dark .el-pagination {
+  color: #e4e7ed !important;
+}
+
+html.dark .el-pagination .el-pager li {
+  background-color: #2a2a2a !important;
+  border: 1px solid #404040 !important;
+  color: #e4e7ed !important;
+}
+
+html.dark .el-pagination .el-pager li:hover {
+  background-color: #3a3a3a !important;
+  color: #409eff !important;
+}
+
+html.dark .el-pagination .el-pager li.is-active {
+  background-color: #409eff !important;
+  color: #fff !important;
+}
+
+html.dark .el-pagination .btn-prev,
+html.dark .el-pagination .btn-next {
+  background-color: #2a2a2a !important;
+  border: 1px solid #404040 !important;
+  color: #e4e7ed !important;
+}
+
+html.dark .el-pagination .btn-prev:hover,
+html.dark .el-pagination .btn-next:hover {
+  background-color: #3a3a3a !important;
+  color: #409eff !important;
+}
+
+html.dark .el-pagination .el-pagination__jump {
+  color: #e4e7ed !important;
+}
+
+html.dark .el-pagination .el-input__wrapper {
+  background-color: #2a2a2a !important;
+  border-color: #404040 !important;
+}
+
+/* 树形组件 */
+html.dark .el-tree {
+  background-color: #1a1a1a !important;
+  color: #e4e7ed !important;
+}
+
+html.dark .el-tree-node__content {
+  color: #e4e7ed !important;
+}
+
+html.dark .el-tree-node__content:hover {
+  background-color: #262626 !important;
+}
+
+html.dark .el-tree-node.is-current > .el-tree-node__content {
+  background-color: #409eff !important;
+  color: #fff !important;
+}
+
+html.dark .el-tree-node__expand-icon {
+  color: #909399 !important;
+}
+
+/* 对话框组�?*/
+html.dark .el-dialog {
+  background-color: #1a1a1a !important;
+  border: 1px solid #404040 !important;
+}
+
+html.dark .el-dialog__header {
+  background-color: #1a1a1a !important;
+  border-bottom: 1px solid #333 !important;
+}
+
+html.dark .el-dialog__title {
+  color: #e4e7ed !important;
+}
+
+html.dark .el-dialog__headerbtn .el-dialog__close {
+  color: #909399 !important;
+}
+
+html.dark .el-dialog__headerbtn .el-dialog__close:hover {
+  color: #409eff !important;
+}
+
+html.dark .el-dialog__body {
+  background-color: #1a1a1a !important;
+  color: #e4e7ed !important;
+}
+
+html.dark .el-dialog__footer {
+  background-color: #1a1a1a !important;
+  border-top: 1px solid #333 !important;
+}
+
+/* 表单组件 */
+html.dark .el-form-item__label {
+  color: #e4e7ed !important;
+}
+
+html.dark .el-form-item__error {
+  color: #f56c6c !important;
+}
+
+/* 空状态组�?*/
+html.dark .el-empty {
+  background-color: transparent !important;
+}
+
+html.dark .el-empty__description p {
+  color: #909399 !important;
+}
+
+/* 标签组件 */
+html.dark .el-tag {
+  background-color: #2a2a2a !important;
+  border-color: #404040 !important;
+  color: #e4e7ed !important;
+}
+
+html.dark .el-tag--success {
+  background-color: #67c23a !important;
+  color: #fff !important;
+}
+
+html.dark .el-tag--danger {
+  background-color: #f56c6c !important;
+  color: #fff !important;
+}
+
+html.dark .el-tag--warning {
+  background-color: #e6a23c !important;
+  color: #fff !important;
+}
+
+html.dark .el-tag--info {
+  background-color: #909399 !important;
+  color: #fff !important;
+}
+
+/* 工具提示组件 */
+html.dark .el-tooltip__popper.is-dark {
+  background: #2a2a2a !important;
+  color: #e4e7ed !important;
+}
+
+html.dark .el-tooltip__popper.is-dark .el-tooltip__arrow::before {
+  background: #2a2a2a !important;
+  border: 1px solid #404040 !important;
+}
+
+/* 加载组件 */
+html.dark .el-loading-mask {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+html.dark .el-loading-spinner .el-loading-text {
+  color: #e4e7ed !important;
+}
+
+html.dark .el-loading-spinner .path {
+  stroke: #409eff !important;
+}
+
+/* 选择器组�?*/
+html.dark .el-select .el-input.is-focus .el-input__wrapper {
+  border-color: #409eff !important;
+  box-shadow: 0 0 0 1px #409eff inset !important;
+}
+
+html.dark .el-select-dropdown {
+  background-color: #2a2a2a !important;
+  border: 1px solid #404040 !important;
+}
+
+html.dark .el-select-dropdown__item {
+  color: #e4e7ed !important;
+}
+
+html.dark .el-select-dropdown__item:hover {
+  background-color: #3a3a3a !important;
+}
+
+html.dark .el-select-dropdown__item.selected {
+  background-color: #409eff !important;
+  color: #fff !important;
+}
+
+/* 自定义组件样式增�?*/
+html.dark .tree-node {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #e4e7ed !important;
+}
+
+html.dark .tree-node .el-icon {
+  color: #909399 !important;
+}
+
+html.dark .node-info {
+  color: #8d9095 !important;
+  font-size: 12px;
+}
+
+html.dark .column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+html.dark .null-value {
+  color: #8d9095 !important;
+  font-style: italic;
+}
+
+/* 滚动条样式增�?*/
+html.dark *::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html.dark *::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+html.dark *::-webkit-scrollbar-thumb {
+  background: #404040;
+  border-radius: 4px;
+}
+
+html.dark *::-webkit-scrollbar-thumb:hover {
+  background: #505050;
+}
+
+html.dark *::-webkit-scrollbar-corner {
+  background: #1a1a1a;
+}

@@ -1,160 +1,375 @@
+<template>
+  <div class="mysql-manager">
+    <!-- 头部工具栏-->
+    <div class="header">
+      <div class="header-left">
+        <h1>MySQL 管理</h1>
+        <el-button-group>
+          <el-button type="primary" @click="showConnectionDialog" :disabled="!isDisconnected">
+            <el-icon>
+              <Link />
+            </el-icon>
+            连接
+          </el-button>
+          <el-button v-if="!isDisconnected" @click="disconnect">
+            <el-icon>
+              <Close />
+            </el-icon>
+            断开连接
+          </el-button>
+        </el-button-group>
+      </div>
+      <div class="header-right">
+        <div class="header-controls">
+          <!-- 主题切换按钮 -->
+          <el-tooltip :content="isDark ? '切换到亮色模式(Ctrl+Shift+T)' : '切换到暗色模式(Ctrl+Shift+T)'">
+            <el-button @click="toggleTheme" :icon="isDark ? Sunny : Moon" circle />
+          </el-tooltip>
+
+          <span v-if="connectionInfo" class="connection-info">
+            已连连接 {{ connectionInfo.username }}@{{ connectionInfo.host }}:{{ connectionInfo.port }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <div class="main-content">
+      <!-- 左侧数据库浏览器 -->
+      <div class="sidebar">
+        <DatabaseBrowser v-if="!isDisconnected" @node-click="handleNodeClick" />
+        <div v-else class="empty-sidebar">
+          <el-empty description="请先连接数据库" />
+        </div>
+      </div>
+
+      <!-- 右侧内容区域 -->
+      <div class="content">
+        <el-tabs v-model="activeTab" type="card" closable @tab-remove="removeTab">
+          <!-- SQL 编辑器标签页 -->
+          <el-tab-pane label="SQL 查询" name="sql-editor">
+            <SqlEditor ref="sqlEditorRef" :initial-query="initialQuery" />
+          </el-tab-pane>
+
+          <!-- 表查看器标签�?-->
+          <el-tab-pane v-for="tab in tableTabs" :key="tab.name" :label="tab.label" :name="tab.name">
+            <TableViewer :database="tab.database" :table="tab.table" @generate-query="handleGenerateQuery" />
+          </el-tab-pane>
+        </el-tabs>
+
+        <!-- 如果没有连接，显示欢迎界�?-->
+        <div v-if="isDisconnected" class="welcome">
+          <el-empty>
+            <template #description>
+              <p>请点击上方的连接按钮连接到数据库</p>
+            </template>
+            <el-button type="primary" @click="showConnectionDialog">
+              立即连接
+            </el-button>
+          </el-empty>
+        </div>
+      </div>
+    </div>
+
+    <!-- 连接对话�?-->
+    <ConnectionDialog v-model="connectionDialogVisible" @connected="handleConnected" />
+  </div>
+</template>
+
 <script setup lang="ts">
-import { ref } from "vue";
-import { invoke } from "@tauri-apps/api/core";
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Link, Close, Sunny, Moon } from '@element-plus/icons-vue'
+import ConnectionDialog from './components/ConnectionDialog.vue'
+import DatabaseBrowser from './components/DatabaseBrowser.vue'
+import SqlEditor from './components/SqlEditor.vue'
+import TableViewer from './components/TableViewer.vue'
+import { DatabaseService } from './services/database'
+import { useTheme } from './composables/useTheme'
+import type { ConnectionConfig } from './types'
 
-const greetMsg = ref("");
-const name = ref("");
+interface TableTab {
+  name: string
+  label: string
+  database: string
+  table: string
+}
 
-async function greet() {
-  // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-  greetMsg.value = await invoke("greet", { name: name.value });
+const connectionDialogVisible = ref(false)
+const connectionInfo = ref<ConnectionConfig | null>(null)
+const activeTab = ref('sql-editor')
+const tableTabs = ref<TableTab[]>([])
+const initialQuery = ref('')
+const sqlEditorRef = ref()
+
+// 主题功能
+const { isDark, toggleTheme, initTheme, setupKeyboardShortcut, removeKeyboardShortcut } = useTheme()
+
+const isDisconnected = computed(() => !connectionInfo.value)
+
+// 初始化主题和键盘快捷�?
+onMounted(() => {
+  initTheme()
+  setupKeyboardShortcut()
+})
+
+// 组件卸载时清理事件监听器
+onUnmounted(() => {
+  removeKeyboardShortcut()
+})
+
+const showConnectionDialog = () => {
+  connectionDialogVisible.value = true
+}
+
+const handleConnected = (config: ConnectionConfig) => {
+  connectionInfo.value = config
+  ElMessage.success('数据库连接成功！')
+}
+
+const disconnect = async () => {
+  try {
+    await ElMessageBox.confirm('确定要断开数据库连接吗？', '确认', {
+      type: 'warning'
+    })
+
+    await DatabaseService.disconnect()
+    connectionInfo.value = null
+    tableTabs.value = []
+    activeTab.value = 'sql-editor'
+    initialQuery.value = ''
+
+    ElMessage.success('已断开连接')
+  } catch (error: any) {
+    if (error === 'cancel') return
+    console.log(error);
+
+    ElMessage.error(error || '断开连接失败')
+  }
+}
+
+const handleNodeClick = (data: any) => {
+  if (data.type === 'database') {
+    // 点击数据库，可以在这里添加相关逻辑
+    console.log('选择数据�?', data.database)
+  } else if (data.type === 'table') {
+    // 点击表，打开表查看器
+    openTableViewer(data.database, data.table)
+  } else if (data.type === 'column') {
+    // 点击字段，可以插入到 SQL 编辑�?
+    const columnName = `\`${data.database}\`.\`${data.table}\`.\`${data.column.name}\``
+    if (sqlEditorRef.value) {
+      sqlEditorRef.value.insertQuery(columnName)
+    }
+  }
+}
+
+const openTableViewer = (database: string, table: string) => {
+  const tabName = `table_${database}_${table}`
+  const existingTab = tableTabs.value.find(tab => tab.name === tabName)
+
+  if (!existingTab) {
+    tableTabs.value.push({
+      name: tabName,
+      label: `${database}.${table}`,
+      database,
+      table
+    })
+  }
+
+  activeTab.value = tabName
+}
+
+const removeTab = (tabName: string) => {
+  if (tabName === 'sql-editor') return
+
+  const index = tableTabs.value.findIndex(tab => tab.name === tabName)
+  if (index !== -1) {
+    tableTabs.value.splice(index, 1)
+    if (activeTab.value === tabName) {
+      activeTab.value = 'sql-editor'
+    }
+  }
+}
+
+const handleGenerateQuery = (query: string) => {
+  initialQuery.value = query
+  activeTab.value = 'sql-editor'
+
+  // 等待标签页切换完成后插入查询
+  setTimeout(() => {
+    if (sqlEditorRef.value) {
+      sqlEditorRef.value.insertQuery(query)
+    }
+  }, 100)
 }
 </script>
 
-<template>
-  <main class="container">
-    <h1>Welcome to Tauri + Vue</h1>
-
-    <div class="row">
-      <a href="https://vitejs.dev" target="_blank">
-        <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-      </a>
-      <a href="https://tauri.app" target="_blank">
-        <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
-      </a>
-      <a href="https://vuejs.org/" target="_blank">
-        <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-      </a>
-    </div>
-    <p>Click on the Tauri, Vite, and Vue logos to learn more.</p>
-
-    <form class="row" @submit.prevent="greet">
-      <input id="greet-input" v-model="name" placeholder="Enter a name..." />
-      <button type="submit">Greet</button>
-    </form>
-    <p>{{ greetMsg }}</p>
-  </main>
-</template>
-
 <style scoped>
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #249b73);
-}
-
-</style>
-<style>
-:root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
-
-  color: #0f0f0f;
-  background-color: #f6f6f6;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
-}
-
-.container {
-  margin: 0;
-  padding-top: 10vh;
+.mysql-manager {
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  text-align: center;
+  background-color: #f0f2f5;
+  transition: background-color 0.3s ease;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
+:global(html.dark) .mysql-manager {
+  background-color: #0a0a0a;
 }
 
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
-}
-
-.row {
+.header {
+  height: 60px;
+  background-color: #fff;
+  border-bottom: 1px solid #e4e7ed;
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+:global(html.dark) .header {
+  background-color: #1a1a1a;
+  border-bottom-color: #333;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-left h1 {
+  margin: 0;
+  color: #303133;
+  font-size: 20px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+:global(html.dark) .header-left h1 {
+  color: #e4e7ed;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.connection-info {
+  color: #67c23a;
+  font-size: 14px;
+}
+
+:global(html.dark) .connection-info {
+  color: #95d475;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.sidebar {
+  width: 300px;
+  background-color: #fff;
+  border-right: 1px solid #e4e7ed;
+  flex-shrink: 0;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+:global(html.dark) .sidebar {
+  background-color: #1a1a1a;
+  border-right-color: #333;
+}
+
+.empty-sidebar {
+  display: flex;
+  align-items: center;
   justify-content: center;
+  height: 100%;
+  padding: 20px;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+.content {
+  flex: 1;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  transition: background-color 0.3s ease;
 }
 
-a:hover {
-  color: #535bf2;
+:global(html.dark) .content {
+  background-color: #1a1a1a;
 }
 
-h1 {
-  text-align: center;
+.welcome {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
 }
 
-input,
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+:deep(.el-tabs__content) {
+  flex: 1;
+  padding: 0;
 }
 
-button {
-  cursor: pointer;
+:deep(.el-tab-pane) {
+  height: 100%;
 }
 
-button:hover {
-  border-color: #396cd8;
-}
-button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
-}
-
-input,
-button {
-  outline: none;
+/* 暗色模式�?Element Plus 组件的样式覆�?*/
+:global(body.dark .el-button) {
+  background-color: #2a2a2a;
+  border-color: #404040;
+  color: #e4e7ed;
 }
 
-#greet-input {
-  margin-right: 5px;
+:global(body.dark .el-button:hover) {
+  background-color: #3a3a3a;
+  border-color: #505050;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
-  }
-
-  a:hover {
-    color: #24c8db;
-  }
-
-  input,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
-  }
-  button:active {
-    background-color: #0f0f0f69;
-  }
+:global(body.dark .el-button--primary) {
+  background-color: #409eff;
+  border-color: #409eff;
 }
 
+:global(body.dark .el-button--primary:hover) {
+  background-color: #66b1ff;
+  border-color: #66b1ff;
+}
+
+:global(body.dark .el-tabs__header) {
+  background-color: #1a1a1a;
+}
+
+:global(body.dark .el-tabs__nav) {
+  background-color: #1a1a1a;
+}
+
+:global(body.dark .el-tabs__item) {
+  color: #909399;
+}
+
+:global(body.dark .el-tabs__item.is-active) {
+  color: #409eff;
+}
+
+:global(body.dark .el-empty__description p) {
+  color: #909399;
+}
 </style>
